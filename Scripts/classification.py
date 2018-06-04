@@ -31,13 +31,13 @@ class KernelGridSearchCV:
     """
 
     def __init__(self, clf, param_grid, n_folds, random_state = None, refit = True):
-        self.clf_          = clf
-        self.grid_         = param_grid
-        self.n_folds_      = n_folds
-        self.random_state_ = random_state
-        self.refit_        = refit
-        self.best_clf_     = None
-        self.best_score_   = None
+        self.clf_             = clf
+        self.grid_            = param_grid
+        self.n_folds_         = n_folds
+        self.random_state_    = random_state
+        self.refit_           = refit
+        self.best_estimator_  = None
+        self.best_score_      = None
 
     def fit(self, X, y):
         cv = StratifiedKFold(
@@ -68,19 +68,17 @@ class KernelGridSearchCV:
 
             score = np.mean(scores)
             if not self.best_score_ or score > self.best_score_:
-                self.best_clf_   = clf
-                self.best_score_ = score
+                self.best_estimator_ = clf
+                self.best_score_     = score
 
 def find_hyperparameters(X, y, parameters):
     """
     Performs a grid search to find the best hyperparameters.
     """
 
-    #grid = {
-    #    'logisticregression__C'      : 10. ** np.arange(-5, 5),
-    #    'logisticregression__penalty': ['l1', 'l2']
-    #}
-
+    grid = {
+        'svc__C': 10. ** np.arange(-5, 5),
+    }
 
     svm = SVC(
         kernel      = 'precomputed',
@@ -103,37 +101,19 @@ def find_hyperparameters(X, y, parameters):
         random_state = 42
     )
 
-    scores = []
-    for train, test in cv.split(np.zeros(len(y)), y):
-        X_train = X[train][:, train]
-        y_train = y[train]
-        X_test  = X[test][:, train]
-        y_test  = y[test]
+    grid_search = KernelGridSearchCV(
+        clf,
+        param_grid   = grid,
+        n_folds      = parameters['n_folds'],
+        refit        = True,
+        random_state = 42
+    )
 
-        clf.fit(X_train, y_train)
-        y_pred = clf.predict(X_test)
-        f1     = f1_score(y_test, y_pred, average='weighted')
-
-        scores.append(f1)
-
-    print(np.mean(scores), np.std(scores))
-
-    clf.fit(X, y)
-    return clf
-
-    #grid_search = GridSearchCV(
-    #    clf,
-    #    param_grid   = grid,
-    #    scoring      = 'average_precision',
-    #    cv           = parameters['n_folds'],
-    #    refit        = True,
-    #)
-
-    #grid_search.fit(X, y)
+    grid_search.fit(X,y)
 
     # This returns the best estimator, which might either be
     # a classifier on its own or a pipeline.
-    #return grid_search.best_estimator_, grid_search.best_score_
+    return grid_search.best_estimator_, grid_search.best_score_
 
 def predict(name, X, y, clf):
     """
@@ -212,11 +192,15 @@ if __name__ == '__main__':
         X_test  = X[test][:, train]
         y_test  = y[test]
 
-        best_clf = find_hyperparameters(
+        best_clf, best_score = find_hyperparameters(
             X_train,
             y_train,
             parameters
         )
+
+        # Refit to the training data set because we cannot use the
+        # classifier otherwise.
+        best_clf.fit(X_train, y_train)
 
         ################################################################
         # Perform predictions on the best classifier
