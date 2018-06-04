@@ -15,6 +15,7 @@ from sklearn.metrics         import f1_score
 from sklearn.metrics         import precision_score
 from sklearn.metrics         import recall_score
 from sklearn.metrics         import roc_auc_score
+from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline        import make_pipeline
 from sklearn.preprocessing   import StandardScaler
@@ -30,12 +31,11 @@ def find_hyperparameters(X, y, parameters):
     #    'logisticregression__penalty': ['l1', 'l2']
     #}
 
+
     svm = SVC(
         kernel      = 'precomputed',
         probability = True
     )
-
-    clf = None
 
     if parameters['standardize']:
         clf = make_pipeline(
@@ -46,6 +46,27 @@ def find_hyperparameters(X, y, parameters):
         clf = make_pipeline(
             svm
         )
+
+    cv = StratifiedKFold(
+        n_splits     = parameters['n_folds'],
+        shuffle      = True,
+        random_state = 42
+    )
+
+    scores = []
+    for train, test in cv.split(np.zeros(len(y)), y):
+        X_train = X[train][:, train]
+        y_train = y[train]
+        X_test  = X[test][:, train]
+        y_test  = y[test]
+
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        f1     = f1_score(y_test, y_pred, average='weighted')
+
+        scores.append(f1)
+
+    print(np.mean(scores), np.std(scores))
 
     clf.fit(X, y)
     return clf
