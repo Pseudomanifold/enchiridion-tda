@@ -78,7 +78,7 @@ def find_hyperparameters(X, y, parameters):
     """
 
     grid = {
-        'svc__C': 10. ** np.arange(-5, 5),
+        'svc__C': 10. ** np.arange(-2, 4),
     }
 
     svm = SVC(
