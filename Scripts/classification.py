@@ -15,11 +15,61 @@ from sklearn.metrics         import f1_score
 from sklearn.metrics         import precision_score
 from sklearn.metrics         import recall_score
 from sklearn.metrics         import roc_auc_score
+from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline        import make_pipeline
 from sklearn.preprocessing   import StandardScaler
 from sklearn.svm             import SVC
+
+class KernelGridSearchCV:
+    """
+    A simple class for performing a grid search for kernel matrices with
+    a cross-validation strategy. At present, the class interface follows
+    the default interface of `scikit-learn`. However, the class is *not*
+    yet inheriting from any base class.
+    """
+
+    def __init__(self, clf, param_grid, n_folds, random_state = None, refit = True):
+        self.clf_          = clf
+        self.grid_         = param_grid
+        self.n_folds_      = n_folds
+        self.random_state_ = random_state
+        self.refit_        = refit
+        self.best_clf_     = None
+        self.best_score_   = None
+
+    def fit(self, X, y):
+        cv = StratifiedKFold(
+                n_splits     = self.n_folds_,
+                shuffle      = True,
+                random_state = self.random_state_
+        )
+
+        grid = ParameterGrid(self.grid_)
+        for parameters in grid:
+            clf = self.clf_
+            clf.set_params(**parameters)
+
+            scores = []
+            for train, test in cv.split(np.zeros(len(y)), y):
+                X_train = X[train][:, train]
+                y_train = y[train]
+                X_test  = X[test][:, train]
+                y_test  = y[test]
+
+                clf.fit(X_train, y_train)
+                y_pred_proba = clf.predict_proba(X_test)
+
+                # TODO: should make this configurable in order to
+                # support more scoring functions
+                ap = average_precision_score(y_test, y_pred_proba[:,1], average='weighted')
+                scores.append(ap)
+
+            score = np.mean(scores)
+            if not self.best_score_ or score > self.best_score_:
+                self.best_clf_   = clf
+                self.best_score_ = score
 
 def find_hyperparameters(X, y, parameters):
     """
