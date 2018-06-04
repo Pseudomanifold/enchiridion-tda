@@ -9,6 +9,7 @@ import warnings
 import numpy  as np
 import pandas as pd
 
+from sklearn.base            import clone
 from sklearn.metrics         import accuracy_score
 from sklearn.metrics         import average_precision_score
 from sklearn.metrics         import f1_score
@@ -67,8 +68,8 @@ class KernelGridSearchCV:
                 scores.append(ap)
 
             score = np.mean(scores)
-            if not self.best_score_ or score > self.best_score_:
-                self.best_estimator_ = clf
+            if self.best_score_ is None or score > self.best_score_:
+                self.best_estimator_ = clone(clf)
                 self.best_score_     = score
 
 def find_hyperparameters(X, y, parameters):
@@ -94,12 +95,6 @@ def find_hyperparameters(X, y, parameters):
         clf = make_pipeline(
             svm
         )
-
-    cv = StratifiedKFold(
-        n_splits     = parameters['n_folds'],
-        shuffle      = True,
-        random_state = 42
-    )
 
     grid_search = KernelGridSearchCV(
         clf,
