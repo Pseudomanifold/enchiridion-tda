@@ -17,6 +17,7 @@ from sklearn.metrics         import recall_score
 from sklearn.metrics         import roc_auc_score
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline        import make_pipeline
+from sklearn.preprocessing   import StandardScaler
 from sklearn.svm             import SVC
 
 def find_hyperparameters(X, y, parameters):
