@@ -71,6 +71,7 @@ class KernelGridSearchCV:
             if self.best_score_ is None or score > self.best_score_:
                 self.best_estimator_ = clone(clf)
                 self.best_score_     = score
+                self.best_params_    = parameters
 
 def find_hyperparameters(X, y, parameters):
     """
@@ -78,7 +79,7 @@ def find_hyperparameters(X, y, parameters):
     """
 
     grid = {
-        'svc__C': 10. ** np.arange(-2, 4),
+        'svc__C': 10. ** np.arange(-2, 5),
     }
 
     svm = SVC(
@@ -106,9 +107,7 @@ def find_hyperparameters(X, y, parameters):
 
     grid_search.fit(X,y)
 
-    # This returns the best estimator, which might either be
-    # a classifier on its own or a pipeline.
-    return grid_search.best_estimator_, grid_search.best_score_
+    return grid_search.best_estimator_, grid_search.best_score_, grid_search.best_params_
 
 def predict(name, X, y, clf):
     """
@@ -187,11 +186,13 @@ if __name__ == '__main__':
         X_test  = X[test][:, train]
         y_test  = y[test]
 
-        best_clf, best_score = find_hyperparameters(
+        best_clf, best_score, best_params = find_hyperparameters(
             X_train,
             y_train,
             parameters
         )
+
+        print(best_params)
 
         # Refit to the training data set because we cannot use the
         # classifier otherwise.
