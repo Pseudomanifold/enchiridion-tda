@@ -128,12 +128,12 @@ def predict(name, X, y, clf):
     print('---')
     print(name)
     print('---')
-    print('  - Accuracy         : {:0.2f}'.format(accuracy))
-    print('  - Average precision: {:0.2f}'.format(pr_auc))
-    print('  - F1               : {:0.2f}'.format(f1))
-    print('  - Precision        : {:0.2f}'.format(precision))
-    print('  - Recall           : {:0.2f}'.format(recall))
-    print('  - ROC AUC          : {:0.2f}'.format(roc_auc))
+    print('  - Accuracy         : {:0.4f}'.format(accuracy))
+    print('  - Average precision: {:0.4f}'.format(pr_auc))
+    print('  - F1               : {:0.4f}'.format(f1))
+    print('  - Precision        : {:0.4f}'.format(precision))
+    print('  - Recall           : {:0.4f}'.format(recall))
+    print('  - ROC AUC          : {:0.4f}'.format(roc_auc))
 
     sys.stdout.flush()
 
