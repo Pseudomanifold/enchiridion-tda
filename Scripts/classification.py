@@ -158,7 +158,7 @@ if __name__ == '__main__':
     # FIXME: make configurable
     standardize = False
     folds       = 4
-    test_size   = 0.20
+    test_size   = 0.10
 
     parameters = {
         'standardize': standardize, # Flag indicating whether standardization should be used
