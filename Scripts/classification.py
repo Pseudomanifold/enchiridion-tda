@@ -192,7 +192,7 @@ if __name__ == '__main__':
 
         logging.info('Finding best hyperparameters with test size = {:0.2f}...'.format(test_size))
 
-        sss                         = StratifiedShuffleSplit(n_splits = 1, random_state = 42)
+        sss                         = StratifiedShuffleSplit(n_splits = 1, random_state = 42, test_size = test_size)
         [(train, test)]             = sss.split(np.zeros(n), y)
 
         X_train = X[train][:, train]
