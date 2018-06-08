@@ -20,6 +20,7 @@ from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.pipeline        import make_pipeline
+from sklearn.preprocessing   import LabelEncoder
 from sklearn.preprocessing   import StandardScaler
 from sklearn.svm             import SVC
 
@@ -165,9 +166,7 @@ if __name__ == '__main__':
 
         X = np.genfromtxt(filename_X)
         y = np.genfromtxt(filename_y)
-        y = np.where(y > 0.0, 1, 0)   # Make the class labels binary as I do not
-                                      # want to tackle multi-class clasification
-                                      # for now.
+        y = LabelEncoder().fit_transform(y)
 
         n, m = X.shape
         assert n == m, 'Kernel matrix is invalid'
