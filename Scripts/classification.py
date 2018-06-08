@@ -12,6 +12,7 @@ import pandas as pd
 from sklearn.base            import clone
 from sklearn.metrics         import accuracy_score
 from sklearn.metrics         import average_precision_score
+from sklearn.metrics         import classification_report
 from sklearn.metrics         import f1_score
 from sklearn.metrics         import precision_score
 from sklearn.metrics         import recall_score
@@ -61,11 +62,17 @@ class KernelGridSearchCV:
                 y_test  = y[test]
 
                 clf.fit(X_train, y_train)
-                y_pred_proba = clf.predict_proba(X_test)
 
                 # TODO: should make this configurable in order to
                 # support more scoring functions
-                ap = average_precision_score(y_test, y_pred_proba[:,1], average='weighted')
+                if np.max(y) > 1:
+                    ap = accuracy_score(y_test, clf.predict(X_test))
+
+                # Use decision function to obtain scores because we are
+                # in the binary setting
+                else:
+                    ap = average_precision_score(y_test, clf.decision_function(X_test))
+
                 scores.append(ap)
 
             score = np.mean(scores)
@@ -118,23 +125,31 @@ def predict(name, X, y, clf):
 
     y_pred_proba = clf.predict_proba(X)
     y_pred       = clf.predict(X)
-
     accuracy     = accuracy_score(y, y_pred)
-    pr_auc       = average_precision_score(y, y_pred_proba[:,1], average='weighted')
-    f1           = f1_score(y, y_pred, average='weighted')
-    precision    = precision_score(y, y_pred, average='weighted')
-    recall       = recall_score(y, y_pred, average='weighted')
-    roc_auc      = roc_auc_score(y, y_pred_proba[:,1])
 
     print('---')
     print(name)
     print('---')
-    print('  - Accuracy         : {:0.4f}'.format(accuracy))
-    print('  - Average precision: {:0.4f}'.format(pr_auc))
-    print('  - F1               : {:0.4f}'.format(f1))
-    print('  - Precision        : {:0.4f}'.format(precision))
-    print('  - Recall           : {:0.4f}'.format(recall))
-    print('  - ROC AUC          : {:0.4f}'.format(roc_auc))
+
+    if np.max(y) > 1:
+        print('Accuracy             : {:0.4f}'.format(accuracy))
+        print('Classification report:')
+        print(classification_report(y, y_pred))
+
+    # Binary problem, we can print more information
+    else:
+        pr_auc       = average_precision_score(y, y_pred_proba[:,1], average='weighted')
+        f1           = f1_score(y, y_pred, average='weighted')
+        precision    = precision_score(y, y_pred, average='weighted')
+        recall       = recall_score(y, y_pred, average='weighted')
+        roc_auc      = roc_auc_score(y, y_pred_proba[:,1])
+
+        print('  - Accuracy         : {:0.4f}'.format(accuracy))
+        print('  - Average precision: {:0.4f}'.format(pr_auc))
+        print('  - F1               : {:0.4f}'.format(f1))
+        print('  - Precision        : {:0.4f}'.format(precision))
+        print('  - Recall           : {:0.4f}'.format(recall))
+        print('  - ROC AUC          : {:0.4f}'.format(roc_auc))
 
     sys.stdout.flush()
 
