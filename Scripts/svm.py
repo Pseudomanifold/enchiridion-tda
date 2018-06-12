@@ -1,3 +1,14 @@
+{'svc__C': 0.1}
+---
+DD
+---
+  - Accuracy         : 0.7203
+  - Average precision: 0.7261
+  - F1               : 0.7088
+  - Precision        : 0.7230
+  - Recall           : 0.7203
+  - ROC AUC          : 0.8036
+
 {'svc__C': 0.01}
 ---
 REDDIT-BINARY
@@ -118,3 +129,14 @@ Classification report:
           4       0.39      0.30      0.34       100
 
 avg / total       0.47      0.48      0.48       500
+
+{'svc__C': 1000.0}
+---
+MUTAG
+---
+  - Accuracy         : 0.9474
+  - Average precision: 0.9786
+  - F1               : 0.9483
+  - Precision        : 0.9549
+  - Recall           : 0.9474
+  - ROC AUC          : 0.9359
