@@ -173,8 +173,8 @@ if __name__ == '__main__':
         logging.info('Processing {}...'.format(directory))
 
         name       = os.path.basename(directory)
-        filename_X = os.path.join(directory, 'Kernel.txt')
-        filename_y = os.path.join(directory, 'Labels.txt')
+        filename_X = os.path.join(directory, 'Kernel.txt.gz')
+        filename_y = os.path.join(directory, 'Labels.txt.gz')
 
         assert os.path.exists(filename_X), 'Missing file {}'.format(filename_X)
         assert os.path.exists(filename_y), 'Missing file {}'.format(filename_y)
