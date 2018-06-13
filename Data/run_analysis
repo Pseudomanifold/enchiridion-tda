@@ -1,0 +1,44 @@
+#!/bin/sh
+#
+# Runs the complete analysis pipeline on the data sets in this folder.
+# This involves setting up an installation of Aleph, building the tool
+# for reading graphs, and calculating kernel matrices.
+
+echo "Step 1: Extracting data sets..."
+
+for DATA in *.tar.gz; do
+  tar -xzf $DATA
+done
+
+echo "Step 2: Downloading Aleph..."
+
+git clone --depth=1 https://github.com/Submanifold/Aleph.git
+
+echo "Step 3: Building tools"
+
+mkdir Aleph/build
+cd Aleph/build; cmake ../; make stratified_graph_analysis topological_distance
+
+echo "Step 4: Creating persistence diagrams"
+
+BIN=Aleph/build/src/tools/sparse_adjacency_matrices
+INPUT_PATH="./"
+OUTPUT_PATH="../Results"
+
+for DIR in ${INPUT_PATH}/*; do
+  NAME=`basename $DIR`
+  mkdir $OUTPUT_PATH/$NAME
+  $BIN -o $OUTPUT_PATH/$NAME "$DIR/${NAME}_A.txt"
+done
+
+echo "Step 5: Calculating kernel matrices"
+
+BIN=topological_distance
+INPUT_PATH="../Results"
+
+for DIR in ${INPUT_PATH}/*; do
+  find -s $DIR -name "*_*.txt" -print > "$DIR/Files.txt"
+  $BIN -n -i -p 1 -k -l "$DIR/Files.txt" > "$DIR/Kernel.txt"
+  gzip --best "$DIR/Kernel.txt"
+  gzip --best "$DIR/Labels.txt"
+done
