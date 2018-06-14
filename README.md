@@ -50,7 +50,8 @@ There are several repositories available for topological data analysis:
 For *graph kernels*, a general class of methods for analysing graphs
 with various properties, I recommend the [`graphkernels`](https://github.com/BorgwardtLab/graphkernels) package,
 which offers high-quality and thoroughly-tested implementations of
-numerous graph kernels. For more information, please [read the
+numerous graph kernels. The package has bindings for `C`, `Python`, and
+`R`. For more information, please [read the
 accompanying
 paper](https://academic.oup.com/bioinformatics/article/34/3/530/4209994).
 
