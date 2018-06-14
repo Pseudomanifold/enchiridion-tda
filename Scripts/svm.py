@@ -18,8 +18,20 @@ logging.basicConfig(level=logging.INFO)
 # script. Your mileage may vary, in particular if you choose to employ
 # another kernel.
 best_parameters = {
+    'COLLAB': {'C': 0.01},
     'DD': {'C': 0.1},
-    'REDDIT-BINARY': {'C': 0.01}
+    'FINGERPRINT': {'C': 0.01},
+    'FRANKENSTEIN': {'C': 1.0},
+    'IMDB-BINARY': {'C': 0.01},
+    'IMDB-MULTI': {'C': 10.0},
+    'MUTAG': {'C': 1000.0},
+    'Mutagenicity': {'C': 10.0},
+    'NCI1': {'C': 10.0},
+    'NCI109': {'C': 10.0},
+    'PTC_MR': {'C': 100.0},
+    'PROTEINS': {'C': 1.0},
+    'REDDIT-BINARY': {'C': 0.01},
+    'REDDIT-MULTI-5k': {'C': 0.01}
 }
 
 if __name__ == '__main__':
