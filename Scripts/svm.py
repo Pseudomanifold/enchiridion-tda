@@ -8,6 +8,7 @@ import numpy as np
 
 from sklearn.metrics         import accuracy_score
 from sklearn.metrics         import classification_report
+from sklearn.metrics         import precision_recall_curve
 from sklearn.preprocessing   import LabelEncoder
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.svm             import SVC
@@ -82,3 +83,9 @@ if __name__ == '__main__':
         print('Accuracy             : {:0.2f}'.format(accuracy))
         print('Classification report:')
         print(classification_report(y_test, y_pred))
+
+        p,r,_  = precision_recall_curve(y_test, clf.decision_function(X_test))
+        for x,y in zip(r,p):
+            print(x,y)
+
+        print("\n")
