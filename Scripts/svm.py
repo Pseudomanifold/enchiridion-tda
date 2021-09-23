@@ -6,12 +6,13 @@ import sys
 
 import numpy as np
 
-from sklearn.metrics         import accuracy_score
-from sklearn.metrics         import classification_report
-from sklearn.metrics         import precision_recall_curve
-from sklearn.preprocessing   import LabelEncoder
+from sklearn.metrics import average_precision_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+from sklearn.metrics import precision_recall_curve
+from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import StratifiedShuffleSplit
-from sklearn.svm             import SVC
+from sklearn.svm import SVC
 
 logging.basicConfig(level=logging.INFO)
 
@@ -64,28 +65,30 @@ if __name__ == '__main__':
             logging.info('Setting parameters for data set {} to {}'.format(name, parameters))
             clf.set_params(**parameters)
 
-        sss             = StratifiedShuffleSplit(n_splits = 1, random_state = 42, test_size = test_size)
-        [(train, test)] = sss.split(np.zeros(n), y)
+        np.random.seed(42)
 
-        X_train = X[train][:, train]
-        y_train = y[train]
-        X_test  = X[test][:, train]
-        y_test  = y[test]
+        mean_scores = []
 
-        clf.fit(X_train, y_train)
-        y_pred   = clf.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
+        for i in range(10):
 
-        print('---')
-        print(name)
-        print('---')
+            scores = []
 
-        print('Accuracy             : {:0.2f}'.format(accuracy))
-        print('Classification report:')
-        print(classification_report(y_test, y_pred))
+            sss = StratifiedShuffleSplit(n_splits = 10, test_size = test_size)
+            for train, test in sss.split(np.zeros(n), y):
 
-        p,r,_  = precision_recall_curve(y_test, clf.decision_function(X_test))
-        for x,y in zip(r,p):
-            print(x,y)
+                X_train = X[train][:, train]
+                y_train = y[train]
+                X_test  = X[test][:, train]
+                y_test  = y[test]
 
-        print("\n")
+                clf.fit(X_train, y_train)
+                y_pred   = clf.predict(X_test)
+                accuracy = accuracy_score(y_test, y_pred)
+
+                scores.append(accuracy)
+            
+            print('{:2.2f}'.format(np.mean(scores) * 100.0))
+
+        mean_scores.append(np.mean(scores))
+
+    print('{:2.2f} += {:2.2}'.format(np.mean(mean_scores) * 100, np.std(mean_scores) * 100))
